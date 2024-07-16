@@ -1,0 +1,22 @@
+--mysql--
+select h.hacker_id,
+          h.name,
+          count(c.challenge_id) as c_count
+from Hackers h join Challenges c on h.hacker_id = c.hacker_id
+group by c.hacker_id,h.name
+having c_count = 
+    (select Max(c_max) as max
+    from (select count(c1.challenge_id) as c_max
+    from Challenges c1
+    group by c1.hacker_id) count
+     )
+or c_count in
+    (select distinct c_test as c_unique
+     from
+    (select count(c2.challenge_id) as c_test
+    from Challenges c2
+     group by c2.hacker_id) counts_temp
+     group by c_unique
+     having count(c_unique) =1
+     )
+order by c_count desc, h.hacker_id
